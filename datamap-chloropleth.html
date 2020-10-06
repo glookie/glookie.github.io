@@ -1,0 +1,110 @@
+<html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+<script src="datamaps.all.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<div id="container" style="position: relative; width: 800px; height: 800px;"></div>
+<!--<script>
+    var map = new Datamap({element: document.getElementById('container')});
+</script>-->
+<script>
+    // example data from server
+    var series = [["AK",0.00380393549391973], ["AL",0.00517316077885101], ["AR",0.00399294270632388],
+                  ["AZ",0.00264011414146056], ["CA",0.000505857861360899], ["CO",0.00542811095619512],
+                  ["CT",0.00229502741841445], ["DC",0.0019366963247885], ["DE",0.00241479147692199],
+                  ["FL",0.00493453486118915], ["GA",0.00382182958096982], ["HI",0.00459680335242013],
+                  ["IA",0.00438770729673205], ["ID",9.17092863979452E-06], ["IL",0.0064971672318205], 
+                  ["IN",0.00622304564265177], ["KS",0.00089693265888879], ["KY",0.000223955056035763],
+                  ["LA",0.000288005923388822], ["MA",0.00484324728105121], ["MD",0.00412598761529193],
+                  ["ME",0.00624163270636176], ["MI",0.00624393585940193], ["MN",0.00289842750059478],
+                  ["MO",0.00245742799233235], ["MS",0.00973180311617718], ["MT",0.00823721269842748],
+                  ["NC",0.00945371788988528], ["ND",0.00182709810430313], ["NE",0.0096401692495169],
+                  ["NH",0.0096723843741671], ["NJ",0.00353108200249599], ["NM",0.009060942737394],
+                  ["NV",0.00392479479916441], ["NY",0.00706727596119111], ["OH",0.00761045139652567],
+                  ["OK",0.00199774686084826], ["OR",0.00852087307777772], ["PA",0.0042938770045551],
+                  ["RI",0.002323205027743], ["SC",0.000267619361443588], ["SD",0.00486803908346358],
+                  ["TN",0.00808774171205544], ["TX",0.00255325135337034], ["UT",0.00598335405275987],
+                  ["VA",0.00760186000448702], ["VT",0.008644424633675], ["WA",0.00255459305814497],
+                  ["WI",0.00867145979209461], ["WV",0.0036723235424549], ["WY",0.00401823821121748]];
+
+
+    // Datamaps expect data in format:
+    // { "USA": { "fillColor": "#42a844", numberOfWhatever: 75},
+    //   "FRA": { "fillColor": "#8dc386", numberOfWhatever: 43 } }
+    var dataset = {};
+
+    // We need to colorize every country based on "numberOfWhatever"
+    // colors should be uniq for every value.
+    // For this purpose we create palette(using min/max series-value)
+    var onlyValues = series.map(function(obj){ return obj[1]; });
+    var minValue = Math.min.apply(null, onlyValues),
+            maxValue = Math.max.apply(null, onlyValues);
+
+    // create color palette function
+    // color can be whatever you wish
+    var paletteScale = d3.scale.linear()
+            .domain([minValue,maxValue])
+            .range(["#fffc69","#eb001f"]); // blue color
+
+    // fill dataset in appropriate format
+    series.forEach(function(item){ //
+        // item example value ["USA", 70]
+        var iso = item[0],
+                value = item[1];
+        dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value) };
+    });
+
+	var datafills= {
+		HIGH: '#afafaf',
+		LOW: '#123456',
+		MEDIUM: 'blue',
+		UNKNOWN: 'rgb(0,0,0)',
+		defaultFill: '#EDDC4E'
+	};
+	
+var USdata = {};
+var options = {
+	element: document.getElementById('container'),
+	scope: 'usa',
+	projection: 'mercator', // big world map
+    // countries don't listed in dataset will be painted with this color
+    fills: { defaultFill: '#F5F5F5' },
+	data: dataset,	
+	geographyConfig: {
+		borderColor: '#DEDEDE',
+		highlightBorderWidth: 2,
+		// don't change color on mouse hover
+		highlightFillColor: function(geo) {
+			return geo['fillColor'] || '#F5F5F5';
+		},
+		highlightBorderColor: '#B7B7B7',
+		// show desired information in tooltip
+		popupTemplate: function(geo, data) {
+			// don't show tooltip if country don't present in dataset
+			if (!data) { return ; }
+			// tooltip content
+			return ['<div class="hoverinfo">',
+				'<strong>', geo.properties.name, '</strong>',
+				'<br>Count: <strong>', data.numberOfThings, '</strong>',
+				'</div>'].join('');
+		}
+	},
+	fills: datafills	
+};
+
+    $( document ).ready(function() {
+		console.log( "ready!" );
+	});
+   
+	var map = new Datamap(options);
+	
+	
+    // Draw a legend for this map
+    map.legend();
+	//map.labels({labelColor: 'blue', fontSize: 12});
+	//map.labels({'customLabelText': USdata});
+
+
+	
+</script>
+</html>

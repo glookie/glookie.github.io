@@ -1,0 +1,10 @@
+	{
+		AZ: {
+			fillKey: 'LOW',
+			numberOfThings: 2002
+		},
+		CO: {
+			fillKey: 'MEDIUM',
+			numberOfThings: 10381
+		}
+	}
